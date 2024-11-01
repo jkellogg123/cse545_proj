@@ -34,7 +34,7 @@ def main():
         print(file)
         print(load_data(file))
         print()
-    
+    print("I am richard")
 
 if __name__ == "__main__":
     main()
