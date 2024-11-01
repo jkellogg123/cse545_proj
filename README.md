@@ -17,7 +17,9 @@ Our final project for AI, a hybrid algorithm combining Genetic Algorithm (GA) an
 
 [GA Wikipedia](https://en.wikipedia.org/wiki/Genetic_algorithm)
 
-[WOC Wikipedia](https://en.wikipedia.org/wiki/The_Wisdom_of_Crowds)
+[WOC (inspiration) Wikipedia](https://en.wikipedia.org/wiki/The_Wisdom_of_Crowds)
+
+[WOC Publication co-authored by professor](https://www.semanticscholar.org/paper/Wisdom-of-artificial-crowds-algorithm-for-solving-Yampolskiy-El-Barkouky/2f47de50306aef67e17d124d86a4df1a768476cd)
 
 [Dataset Source](https://www.hexaly.com/docs/last/exampletour/open-shop-scheduling-problem.html)
 
