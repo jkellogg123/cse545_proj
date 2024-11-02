@@ -31,8 +31,10 @@ def load_data(name):
         data = np.array(data, dtype=np.uint8)
         
         # the way the data is formatted is goofy, this "corrects" it
-        # didn't correctly sort the data... I changed it to correspond to the machine.... 
-        # but I don't think this addresses the problem at hand. The machines part of the data is important. this isn't just about sorting the tasks.
+        # didn't correctly sort the data... I changed it to sort times by corresponding job.... 
+        # but I don't think this addresses the problem at hand. 
+        # I propose we use a hash map/ dictionary or c like struct.
+
         file.readline()
         sort = []
         for i in range(n):
