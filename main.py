@@ -33,8 +33,9 @@ def load_data(name):
         # the way the data is formatted is goofy, this "corrects" it
         # didn't correctly sort the data... I changed it to sort times by corresponding job.... 
         # but I don't think this addresses the problem at hand. 
-        # I propose we use a hash map/ dictionary or c like struct.
-
+        # I propose we use a list of hash maps/ dictionaries or c like struct.
+        # Example data:
+        # data[0] = {start_time: 0, runtime: 64, job_id: 5}
         file.readline()
         sort = []
         for i in range(n):

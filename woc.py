@@ -57,6 +57,9 @@ class Woc:
         print(self.A)
 
     def find_agreement(self) -> None:
+        '''
+        agreement based on job_task sequence for each scheduling sequence.
+        '''
         for p in range(self.P):
             for m in range(self.M):
                 for n in range(self.N):
