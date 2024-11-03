@@ -27,6 +27,30 @@ class Solution:
             # Create random solution for initializing population of chromosomes for genetic algorithm
             # Maybe doesn't need to be random, but need some way to populate our initial generation
             pass
+    
+    def job_times(self) -> np.ndarray:
+        """
+        Returns array of finishing times for each machine.
+        """
+
+        if np.isin(-1, self.schedule) or np.isin(-1, self.starts) or self.data is None:
+            return None
+        
+        res = np.empty(self.schedule.shape[0])
+        for i in range(len(res)):
+            res[i] = self.starts[i, -1] + self.data[i, self.schedule[i, -1]]
+        
+        return res
+
+    def makespan(self) -> float:
+        """
+        Returns the makespan of the solution (total finishing time).
+        """
+        jt = self.job_times()
+        if jt is None:
+            return -1
+        else:
+            return np.max(jt)
 
     def mutate(self):
         pass
