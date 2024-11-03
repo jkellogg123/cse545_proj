@@ -19,10 +19,13 @@ class Solution:
     cross_rate = 0.75
     mutate_rate = 0.02
 
-    def __init__(self, n: int, rand=True):
-        self.schedule = np.full((n, n), -1)
-        self.starts = np.full((n, n), -1)
-        if rand and not self.data is None:
+    def __init__(self, rand=True):
+        assert not self.data is None, "Initialize data before instantiating Solution objects"
+        shape = self.data.shape
+        self.schedule = np.full(shape, -1)
+        self.starts = np.full(shape, -1)
+
+        if rand:
             # TODO
             # Create random solution for initializing population of chromosomes for genetic algorithm
             # Maybe doesn't need to be random, but need some way to populate our initial generation

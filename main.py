@@ -41,9 +41,12 @@ def load_data(name):
 
 
 def main():
-    # file = "tai55_3.txt"
+    # file = "tai44_0.txt"
     # data = Solution.data = load_data(file)
+    # sol = Solution()
     # print(data)
+    # print(sol.schedule)
+    # print(sol.makespan())
 
     for file in os.listdir("data"):
         print(file)
