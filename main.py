@@ -14,7 +14,7 @@ Script flow:
 4) Ensure WOC solution satisfies OSSP constraints 
 5) Compare WOC solution with best GA solution
     - if so, replace best solution
-6) Reapeat steps 1-6 for all data files.
+6) Repeat steps 1-6 for all data files.
 '''
 
 def load_data(name):
@@ -31,26 +31,23 @@ def load_data(name):
         data = np.array(data, dtype=np.uint8)
         
         # the way the data is formatted is goofy, this "corrects" it
-        # didn't correctly sort the data... I changed it to sort times by corresponding job.... 
-        # but I don't think this addresses the problem at hand. 
-        # I propose we use a list of hash maps/ dictionaries or c like struct.
-        # Example data:
-        # data[0] = {start_time: 0, runtime: 64, job_id: 5}
         file.readline()
         sort = []
         for i in range(n):
-            sort = np.array(file.readline().strip().split(' '), dtype=np.uint8)
-            data[i] = [val for _, val in sorted(zip(sort-1, data[i]))]
+            sort = np.array(file.readline().strip().split(' '), dtype=np.uint8) - 1
+            data[i][sort] = np.copy(data[i])    # copy is needed because it overwrites element by element, unlike tuple assignment for example
         
-        return data
+    return data.T
 
 
 def main():
+    # file = "tai55_3.txt"
+    # data = Solution.data = load_data(file)
+    # print(data)
 
     for file in os.listdir("data"):
         print(file)
         data = load_data(file)
-        
         print(data)
 
 if __name__ == "__main__":
