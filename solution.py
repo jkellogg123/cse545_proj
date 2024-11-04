@@ -19,16 +19,26 @@ class Solution:
     cross_rate = 0.75
     mutate_rate = 0.02
 
-    def __init__(self, rand=True):
+    def __init__(self, schedule: np.ndarray=None):
+        """
+        If schedule is given, associates a valid solution with start times
+
+        Otherwise, creates a random solution
+        """
         assert not self.data is None, "Initialize data before instantiating Solution objects"
         shape = self.data.shape
-        self.schedule = np.full(shape, -1)
         self.starts = np.full(shape, -1)
 
-        if rand:
+        if schedule is None:
             # TODO
             # Create random solution for initializing population of chromosomes for genetic algorithm
             # Maybe doesn't need to be random, but need some way to populate our initial generation
+            self.schedule = np.full(shape, -1)
+            pass
+        else:
+            # TODO
+            # Create a valid solution from the given schedule. Essentially, assigning a valid "starts" attribute
+            self.schedule = schedule
             pass
     
     def job_times(self) -> np.ndarray:
