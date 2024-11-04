@@ -30,14 +30,13 @@ class Solution:
         assert not self.data is None, "Initialize data before instantiating Solution objects"
 
         self.makespan = -1
-
         if schedule is None:
             # Create random solution
             shape = self.data.shape
             self.schedule = random_schedule(shape)
             self.starts = make_starts(self.schedule)
         else:
-            # Create solution with given schedule, associate a valid starts array
+            # Create solution with given schedule and associate a valid starts array
             self.schedule = schedule
             self.starts = make_starts(schedule)
     
