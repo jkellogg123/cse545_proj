@@ -1,4 +1,4 @@
-# Approximating Open Shop Scheduling with Genetic Algorithms and Wisdom of crowds
+# Approximating Open Shop Scheduling with Genetic Algorithms and Wisdom of crowds 
 
 ## Introduction
 Our final project for AI, a hybrid algorithm combining Genetic Algorithm (GA) and Wisdom of Crowds (WOC) approaches for solving the Open Shop Scheduling Problem (OSSP).
