@@ -46,7 +46,8 @@ def main():
     # sol = Solution()
     # print(data)
     # print(sol.schedule)
-    # print(sol.makespan())
+    # print(sol.starts)
+    # print(sol.calc_makespan())
 
     for file in os.listdir("data"):
         print(file)
