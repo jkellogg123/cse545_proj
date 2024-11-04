@@ -69,14 +69,8 @@ class Solution:
 
 
 def random_schedule(shape: tuple[int, int]) -> np.ndarray:
-    schedule = []
     num_machines, num_jobs = shape
-    for i in range(num_machines):
-        shuff = list(range(num_jobs))
-        random.shuffle(shuff)
-        schedule.append(shuff)
-    
-    return np.array(schedule)
+    return np.array([np.random.permutation(num_jobs) for _ in range(num_machines)])
 
 
 def make_starts(schedule: np.ndarray) -> np.ndarray:
