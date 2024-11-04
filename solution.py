@@ -1,6 +1,7 @@
 from __future__ import annotations
 import numpy as np
 import random
+import random
 import copy
 
 class Solution:
@@ -10,6 +11,7 @@ class Solution:
     Attributes:
         schedule (2D np array):         schedule[i, j] is the jth job of the ith machine
         starts (2D np array):           starts[i, j] is the starting time of the jth job of ith machine
+        makespan (float):               the total time of the solution. If it hasn't been calculated yet, initial value is -1
 
         data (static, 2D np array):     data[i, j] is the time-length of the jth job on the ith machine
         cross_rate (static, float):     0 <= rate <= 1, denotes frequency of crossover operation
@@ -21,40 +23,68 @@ class Solution:
     cross_rate = 0.75
     mutate_rate = 0.02
 
-    def __init__(self, n: int, raw_data: np.ndarray, rand=True):
-        self.schedule = np.full((n, n), -1)
-        self.starts = np.full((n, n), -1)
-        self.raw_data = raw_data
-        self.data = self.random_machines()
-        self.raw_times()
+    def __init__(self, schedule: np.ndarray=None):
+        """
+        If schedule is given, associates a valid solution with start times
+
+        Otherwise, creates a random solution
+        """
+        assert not self.data is None, "Initialize data before instantiating Solution objects"
+
+        self.makespan = -1
+        if schedule is None:
+            # Create random solution
+            shape = self.data.shape
+            self.schedule = random_schedule(shape)
+            self.starts = make_starts(self.schedule)
+        else:
+            # Create solution with given schedule and associate a valid starts array
+            self.schedule = schedule
+            self.starts = make_starts(schedule)
+    
+    def job_times(self) -> np.ndarray:
+        """
+        Returns array of finishing times for each machine.
+        """
+
+        if np.isin(-1, self.schedule) or np.isin(-1, self.starts) or self.data is None:
+            return None
+        
+        res = np.empty(self.schedule.shape[0])
+        for i in range(len(res)):
+            res[i] = self.starts[i, -1] + self.data[i, self.schedule[i, -1]]
+        
+        return res
+
+    def calc_makespan(self) -> float:
+        """
+        Returns and sets the makespan of the solution (total finishing time).
+        """
+        jt = self.job_times()
+        if jt is None:
+            return -1
+        else:
+            ms = np.max(jt)
+            self.makespan = ms
+            return ms
 
 
-    def random_machines (self) -> dict:
-        '''
-        just an example of the structured data... incomplete of course.
-        I do think each of these steps is going to get to be a lot of code...
-        but maybe we can solve it elegantly
-        '''
-        data = []
-        for row in self.raw_data:
-            machine = []
-            for i in range(len(row)):
-                machine.append({"job": i+1, "start": 0, "run": row[i]})
-            random.shuffle(machine)
-            
-            data.append(machine)
-        return data
+def random_schedule(shape: tuple[int, int]) -> np.ndarray:
+    num_machines, num_jobs = shape
+    return np.array([np.random.permutation(num_jobs) for _ in range(num_machines)])
 
-    def raw_times(self):
-        for machine in self.data:
-            for i in range(1, len(machine)):
-                machine[i]["start"] = machine[i-1]["start"] + machine[i-1]["run"]+1
 
-    def add_waits(self):
-        pass
+def make_starts(schedule: np.ndarray) -> np.ndarray:
+    """
+    Returns a valid starts array corresponding to given schedule
 
-    def mutate(self):
-        pass
+    *NOTE: Currently just returns an array of -1s lol*
+    """
+    if schedule is None:
+        return None
 
-    def crossover(s1, s2: Solution) -> tuple[Solution, Solution]:
-        pass
+    shape = schedule.shape
+    starts = np.full(shape, -1)
+    
+
+    return starts

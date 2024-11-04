@@ -15,7 +15,7 @@ Script flow:
 4) Ensure WOC solution satisfies OSSP constraints 
 5) Compare WOC solution with best GA solutiong
     - if so, replace best solution
-6) Reapeat steps 1-6 for all data files.
+6) Repeat steps 1-6 for all data files.
 '''
 
 def load_data(name):
@@ -41,14 +41,20 @@ def load_data(name):
         file.readline()
         sort = []
         for i in range(n):
-            sort = np.array(file.readline().strip().split(' '), dtype=np.uint8)
-            data[i] = [val for _, val in sorted(zip(sort-1, data[i]))]
+            sort = np.array(file.readline().strip().split(' '), dtype=np.uint8) - 1
+            data[i][sort] = np.copy(data[i])    # copy is needed because it overwrites element by element, unlike tuple assignment for example
         
-        return data
-
+    return data.T
 
 
 def main():
+    # file = "tai44_0.txt"
+    # data = Solution.data = load_data(file)
+    # sol = Solution()
+    # print(data)
+    # print(sol.schedule)
+    # print(sol.starts)
+    # print(sol.calc_makespan())
 
     for file in os.listdir("data"):
         print(file)
@@ -57,6 +63,7 @@ def main():
         ga_solver = Solution(20, data)
         for d in ga_solver.data:
             print(d)
+        print(data)
 
 if __name__ == "__main__":
     main()
