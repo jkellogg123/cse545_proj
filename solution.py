@@ -1,5 +1,7 @@
 from __future__ import annotations
 import numpy as np
+import random
+import copy
 
 class Solution:
     """
@@ -19,14 +21,37 @@ class Solution:
     cross_rate = 0.75
     mutate_rate = 0.02
 
-    def __init__(self, n: int, rand=True):
+    def __init__(self, n: int, raw_data: np.ndarray, rand=True):
         self.schedule = np.full((n, n), -1)
         self.starts = np.full((n, n), -1)
-        if rand and not self.data is None:
-            # TODO
-            # Create random solution for initializing population of chromosomes for genetic algorithm
-            # Maybe doesn't need to be random, but need some way to populate our initial generation
-            pass
+        self.raw_data = raw_data
+        self.data = self.random_machines()
+        self.raw_times()
+
+
+    def random_machines (self) -> dict:
+        '''
+        just an example of the structured data... incomplete of course.
+        I do think each of these steps is going to get to be a lot of code...
+        but maybe we can solve it elegantly
+        '''
+        data = []
+        for row in self.raw_data:
+            machine = []
+            for i in range(len(row)):
+                machine.append({"job": i+1, "start": 0, "run": row[i]})
+            random.shuffle(machine)
+            
+            data.append(machine)
+        return data
+
+    def raw_times(self):
+        for machine in self.data:
+            for i in range(1, len(machine)):
+                machine[i]["start"] = machine[i-1]["start"] + machine[i-1]["run"]+1
+
+    def add_waits(self):
+        pass
 
     def mutate(self):
         pass

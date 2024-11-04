@@ -1,8 +1,7 @@
 import numpy as np
-import scipy.special as sc
-import math
-import sys
 
+# a set of orders in which machines execute tasks. 
+# each numerical value is the job a task corresponds to. 
 test_set = [[[2,3,1],[1,3,2],[3,2,1]],
             [[2,3,1],[1,3,2],[3,2,1]],
             [[1,3,2],[2,3,1],[3,2,1]],
@@ -58,7 +57,7 @@ class Woc:
 
     def find_agreement(self) -> None:
         '''
-        agreement based on job_task sequence for each scheduling sequence.
+        agreement based on job_task sequence for each schedule from the population.
         '''
         for p in range(self.P):
             for m in range(self.M):
@@ -72,10 +71,10 @@ class Woc:
         for m in range(self.M):
             for n in range(self.N):
                 solution[m][n] = int(np.argmax(self.A[m][n]))+1
-
         # print(solution)
+        return solution
 
     def solution(self):
         self.find_agreement()
-        self.create_solution()
+        return self.create_solution()
         
