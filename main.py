@@ -1,5 +1,6 @@
 import numpy as np
 import os
+import solution
 from solution import Solution
 from woc import Woc
 '''
@@ -50,14 +51,23 @@ def load_data(name):
 def main():
     file = "tai44_0.txt"
     Solution.data = load_data(file)
-    sol = Solution()
-    print(sol.data)
-    print(sol.schedule)
-    print(sol.starts)
-    print()
-    print(sol.calc_makespan())
-    # woc_solver = Woc(solution_array)
-    # solution = woc_solver.solution() #aggregate schedule
+    schedules = []
+    best_make = float('inf')
+    for ic in range(5):
+        sol = Solution()
+        print(sol.data)
+        schedules.append(sol.schedule)
+        print(sol.starts)
+        print()
+        print(sol.calc_makespan())
+        if sol.makespan < best_make: best_make = sol.makespan
+    aggregator = Woc(schedules)
+    agg = aggregator.solution() #aggregate schedule
+    print(agg)
+    
+    woc_sol = Solution(agg)
+    woc_sol.calc_makespan()
+    print(woc_sol.makespan)
     
 
     # for file in os.listdir("data"):
