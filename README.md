@@ -4,6 +4,7 @@
 Our final project for AI, a hybrid algorithm combining Genetic Algorithm (GA) and Wisdom of Crowds (WOC) approaches for solving the Open Shop Scheduling Problem (OSSP).
 
 ## Problem Description
+The Open Shop Scheduling (OSSP) is a np-complete problem that researches a field of job scheudling and optimzatzing the scheudle of jobs per machine. The main goal of OSSP is to minimize the makespan, which is the total time required to complete of jobs across all machines. The OSSP tries to solve how to assign each job to a machine while also satsifying the job constrainsts. The constraints is that only one job can run on a machine at any time and that only each job can be processed on one machine at a time. 
 
 
 ## GA Approach
