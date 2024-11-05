@@ -63,14 +63,12 @@ class Woc:
                 for n in range(self.N):
                     job_task = self.experts[p][m][n]
                     self.A[m][n][job_task]+=1/self.P
-        # print(self.A)
 
     def create_solution(self) -> np.ndarray:
         solution = np.zeros((self.M, self.N))
         for m in range(self.M):
             for n in range(self.N):
-                solution[m][n] = int(np.argmax(self.A[m][n]))+1
-        # print(solution)
+                solution[m][n] = int(np.argmax(self.A[m][n]))
         return solution
 
     def solution(self):
