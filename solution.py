@@ -1,6 +1,7 @@
 from __future__ import annotations
 import numpy as np
 import bisect
+import matplotlib.pyplot as plt
 
 class Solution:
     """
@@ -28,7 +29,7 @@ class Solution:
 
         Otherwise, creates a random solution
         """
-        assert not self.data is None, "Initialize Solution.data before instantiating Solution objects"
+        assert self.data is not None, "Initialize Solution.data before instantiating Solution objects"
 
         self.makespan = -1
         if schedule is None:
@@ -79,8 +80,8 @@ def make_starts(schedule: np.ndarray) -> np.ndarray:
     """
     Returns a valid starts array corresponding to given schedule
     """
-    assert not Solution.data is None, "Need to initialize Solution.data before make_starts can run."
-    assert not schedule is None, "make_starts called with None schedule! This is a problem I'm afraid."
+    assert Solution.data is not None, "Need to initialize Solution.data before make_starts can run."
+    assert schedule is not None, "make_starts called with None schedule! This is a problem I'm afraid."
 
     shape = schedule.shape
     starts = np.empty(shape)
@@ -131,3 +132,37 @@ def insert_job(after: float, job_starts: list, length: float) -> float:
     
     # Doesn't fit in gaps
     return max(after, job_starts[-1][1])
+
+def plot_solution(solution: Solution):
+    sched = solution.schedule
+    starts = solution.starts
+    data = solution.data
+    num_machines, num_jobs = sched.shape
+
+    colors = plt.cm.get_cmap("tab10", num_jobs)
+    fig, ax = plt.subplots(figsize=(10,6))
+
+    for machine in range(num_machines):
+        for job_index in range(num_jobs):
+            job = sched[machine, job_index]
+            start_time = starts[machine, job_index]
+            duration = data[machine, job]
+
+            # Create a rectangle for the job on the machine's timeline
+            ax.broken_barh([(start_time, duration)], (machine - 0.4, 0.8), facecolors=colors(job))
+
+            # Add text label to the job rectangle
+            ax.text(start_time + duration / 2, machine, f"J{job+1}", va='center', ha='center', color='white')
+
+    # Set labels
+    ax.set_xlabel("Time")
+    ax.set_ylabel("Machines")
+    ax.set_yticks(range(num_machines))
+    ax.set_yticklabels([f"M{i+1}" for i in range(num_machines)])
+    plt.title("Open-Shop Schedule")
+    #ax.grid(True, axis='x', linestyle='--', alpha=0.7)
+
+    # Display's first machine at the top
+    ax.invert_yaxis()
+
+    plt.show()

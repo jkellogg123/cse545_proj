@@ -1,6 +1,7 @@
 import numpy as np
 import os
 from solution import Solution
+from solution import plot_solution
 from woc import Woc
 '''
 Main python file. 
@@ -56,6 +57,7 @@ def main():
     print(sol.starts)
     print()
     print(sol.calc_makespan())
+    plot_solution(sol)
     # woc_solver = Woc(solution_array)
     # solution = woc_solver.solution() #aggregate schedule
     
