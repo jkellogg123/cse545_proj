@@ -16,6 +16,7 @@ class Solution:
     """
 
     data = None
+    task_jobs = None
     cross_rate = 0.75
     mutate_rate = 0.02
 
@@ -30,10 +31,11 @@ class Solution:
         self.starts = np.full(shape, -1)
 
         if schedule is None:
-            # TODO
             # Create random solution for initializing population of chromosomes for genetic algorithm
             # Maybe doesn't need to be random, but need some way to populate our initial generation
-            self.schedule = np.full(shape, -1)
+            self.schedule = np.copy(self.task_jobs)
+            for arr in self.schedule: np.random.shuffle(arr) 
+            print(self.schedule)
             pass
         else:
             # TODO

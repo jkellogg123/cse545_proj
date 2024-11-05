@@ -48,22 +48,23 @@ def load_data(name):
 
 
 def main():
-    # file = "tai44_0.txt"
-    # data = Solution.data = load_data(file)
-    # sol = Solution()
-    # print(data)
-    # print(sol.schedule)
-    # print(sol.starts)
-    # print(sol.calc_makespan())
+    file = "tai44_0.txt"
+    data = Solution.data = load_data(file)
+    Solution.task_jobs = np.array([np.mgrid[0:len(data[0])+1] for _ in range(len(data))])
+    sol = Solution()
+    print(sol.data)
+    print(sol.task_jobs)
+    print(sol.schedule)
+    print(sol.makespan())
 
-    for file in os.listdir("data"):
-        print(file)
-        data = load_data(file)
+    # for file in os.listdir("data"):
+    #     print(file)
+    #     data = load_data(file)
         
-        ga_solver = Solution(20, data)
-        for d in ga_solver.data:
-            print(d)
-        print(data)
+    #     ga_solver = Solution(20, data)
+    #     for d in ga_solver.data:
+    #         print(d)
+    #     print(data)
 
 if __name__ == "__main__":
     main()
