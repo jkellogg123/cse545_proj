@@ -9,7 +9,7 @@ test_set = [[[2,3,1],[1,3,2],[3,2,1]],
             [[2,3,1],[1,3,2],[3,2,1]],
             [[1,3,2],[2,3,1],[3,2,1]]]
 class Woc:
-    def __init__(self, experts: np.ndarray | list, b1:float=0, b2:float=0) -> None:
+    def __init__(self, experts: np.ndarray | list) -> None:
         '''
         Summary:
         This class creates an agreement matrix for  of dimensions (N, N, M),
