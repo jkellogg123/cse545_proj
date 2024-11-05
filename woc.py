@@ -47,8 +47,7 @@ class Woc:
         self.experts = experts
 
         self.P, self.M, self.N = np.array(experts).shape
-        self.b1 = b1 # beta value 1 
-        self.b2 = b2
+
         self.A = np.zeros([self.N, self.M, self.M])
         self.A_shape = np.shape(self.A)
     
@@ -62,7 +61,7 @@ class Woc:
         for p in range(self.P):
             for m in range(self.M):
                 for n in range(self.N):
-                    job_task = self.experts[p][m][n]-1
+                    job_task = self.experts[p][m][n]
                     self.A[m][n][job_task]+=1/self.P
         # print(self.A)
 
