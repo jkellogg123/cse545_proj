@@ -131,24 +131,25 @@ def insert_job(after: float, job_starts: list, length: float) -> float:
     return max(after, job_starts[-1][1])
 
 def plot_solution(solution: Solution):
+    """ Takes a solution and plots it
+    """
     sched = solution.schedule
     starts = solution.starts
     data = solution.data
     num_machines, num_jobs = sched.shape
 
+    # Change tab10 to tab20 or rsv if more than 10 jobs
     colors = plt.cm.get_cmap("tab10", num_jobs)
+    
     fig, ax = plt.subplots(figsize=(10,6))
-
     for machine in range(num_machines):
         for job_index in range(num_jobs):
             job = sched[machine, job_index]
             start_time = starts[machine, job_index]
             duration = data[machine, job]
 
-            # Create a rectangle for the job on the machine's timeline
+            # Creates and labels each job
             ax.broken_barh([(start_time, duration)], (machine - 0.4, 0.8), facecolors=colors(job))
-
-            # Add text label to the job rectangle
             ax.text(start_time + duration / 2, machine, f"J{job+1}", va='center', ha='center', color='white')
 
     # Set labels
