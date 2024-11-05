@@ -57,7 +57,7 @@ def main():
     print()
     print(sol.calc_makespan())
     # woc_solver = Woc(solution_array)
-    # solution = woc_solver.solution()
+    # solution = woc_solver.solution() #aggregate schedule
 
     # for file in os.listdir("data"):
     #     print(file)
