@@ -54,7 +54,10 @@ def main():
     print(sol.data)
     print(sol.schedule)
     print(sol.starts)
+    print()
     print(sol.calc_makespan())
+    # woc_solver = Woc(solution_array)
+    # solution = woc_solver.solution()
 
     # for file in os.listdir("data"):
     #     print(file)
