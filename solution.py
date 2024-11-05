@@ -80,8 +80,7 @@ def make_starts(schedule: np.ndarray) -> np.ndarray:
     Returns a valid starts array corresponding to given schedule
     """
     assert not Solution.data is None, "Need to initialize Solution.data before make_starts can run."
-    if schedule is None:
-        return None
+    assert not schedule is None, "make_starts called with None schedule! This is a problem I'm afraid."
 
     shape = schedule.shape
     starts = np.empty(shape)
