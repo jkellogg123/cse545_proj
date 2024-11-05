@@ -1,8 +1,6 @@
 from __future__ import annotations
 import numpy as np
-import random
-import random
-import copy
+import bisect
 
 class Solution:
     """
@@ -25,11 +23,11 @@ class Solution:
 
     def __init__(self, schedule: np.ndarray=None):
         """
-        If schedule is given, associates a valid solution with start times
+        If *schedule* is given, associates a valid solution with start times
 
         Otherwise, creates a random solution
         """
-        assert not self.data is None, "Initialize data before instantiating Solution objects"
+        assert not self.data is None, "Initialize Solution.data before instantiating Solution objects"
 
         self.makespan = -1
         if schedule is None:
@@ -80,11 +78,56 @@ def make_starts(schedule: np.ndarray) -> np.ndarray:
 
     *NOTE: Currently just returns an array of -1s lol*
     """
+    assert not Solution.data is None, "Need to initialize Solution.data before make_starts can run."
     if schedule is None:
         return None
 
     shape = schedule.shape
-    starts = np.full(shape, -1)
-    
+    starts = np.empty(shape)
+    jobs_busy = [[] for _ in range(shape[1])]     # jobs_busy[i] gives list of (start, end) times where the ith job is busy
+    for col in range(shape[1]):
+        for row in range(shape[0]):
+            if col != 0:
+                prev_job_ind = (row, col-1)
+                prev_job = schedule[prev_job_ind]
+                after = starts[prev_job_ind] + Solution.data[row, prev_job]
+            else:
+                after = 0
+            job = schedule[row, col]
+            length = Solution.data[row, job]
+            start = insert_job(after, jobs_busy[job], length)
+            starts[row, col] = start
+            bisect.insort(jobs_busy[job], (start, start + length), key=lambda x: x[0])
 
     return starts
+
+def insert_job(after: float, job_starts: list, length: float) -> float:
+    """
+    Returns the best starting time for a job that takes *length* time, inserted after *after*, with the given list *job_starts* of busyness for the job
+
+    Used in *make_starts*
+    """
+    if not job_starts:
+        return after
+    
+    # Fits in any gap?
+    for i in range(len(job_starts)):
+        start, end = job_starts[i]
+        # Too early
+        if end < after:
+            continue
+
+        if i == 0:
+            prev_end = -1
+        else:
+            prev_end = job_starts[i-1][1]
+        insert_check = max(after, prev_end)
+
+        # Fits before?
+        if start - length >= insert_check:
+            return insert_check
+        else:
+            continue
+    
+    # Doesn't fit in gaps
+    return max(after, job_starts[-1][1])

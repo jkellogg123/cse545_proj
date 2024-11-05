@@ -48,22 +48,22 @@ def load_data(name):
 
 
 def main():
-    # file = "tai44_0.txt"
-    # data = Solution.data = load_data(file)
-    # sol = Solution()
-    # print(data)
-    # print(sol.schedule)
-    # print(sol.starts)
-    # print(sol.calc_makespan())
+    file = "tai44_0.txt"
+    Solution.data = load_data(file)
+    sol = Solution()
+    print(sol.data)
+    print(sol.schedule)
+    print(sol.starts)
+    print(sol.calc_makespan())
 
-    for file in os.listdir("data"):
-        print(file)
-        data = load_data(file)
+    # for file in os.listdir("data"):
+    #     print(file)
+    #     Solution.data = load_data(file)
         
-        ga_solver = Solution(20, data)
-        for d in ga_solver.data:
-            print(d)
-        print(data)
+    #     ga_solver = Solution()
+    #     for d in ga_solver.data:
+    #         print(d)
+    #     print(Solution.data)
 
 if __name__ == "__main__":
     main()
