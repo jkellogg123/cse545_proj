@@ -9,7 +9,6 @@ class Solution:
     Attributes:
         schedule (2D np array):         schedule[i, j] is the jth job of the ith machine
         starts (2D np array):           starts[i, j] is the starting time of the jth job of ith machine
-        makespan (float):               the total time of the solution. If it hasn't been calculated yet, initial value is -1
 
         data (static, 2D np array):     data[i, j] is the time-length of the jth job on the ith machine
         cross_rate (static, float):     0 <= rate <= 1, denotes frequency of crossover operation
@@ -29,16 +28,17 @@ class Solution:
         """
         assert not self.data is None, "Initialize Solution.data before instantiating Solution objects"
 
-        self.makespan = -1
         if schedule is None:
-            # Create random solution
-            shape = self.data.shape
-            self.schedule = random_schedule(shape)
-            self.starts = make_starts(self.schedule)
+            # TODO
+            # Create random solution for initializing population of chromosomes for genetic algorithm
+            # Maybe doesn't need to be random, but need some way to populate our initial generation
+            self.schedule = np.full(shape, -1)
+            pass
         else:
-            # Create solution with given schedule and associate a valid starts array
+            # TODO
+            # Create a valid solution from the given schedule. Essentially, assigning a valid "starts" attribute
             self.schedule = schedule
-            self.starts = make_starts(schedule)
+            pass
     
     def job_times(self) -> np.ndarray:
         """
@@ -54,17 +54,15 @@ class Solution:
         
         return res
 
-    def calc_makespan(self) -> float:
+    def makespan(self) -> float:
         """
-        Returns and sets the makespan of the solution (total finishing time).
+        Returns the makespan of the solution (total finishing time).
         """
         jt = self.job_times()
         if jt is None:
             return -1
         else:
-            ms = np.max(jt)
-            self.makespan = ms
-            return ms
+            return np.max(jt)
 
 
 def random_schedule(shape: tuple[int, int]) -> np.ndarray:
