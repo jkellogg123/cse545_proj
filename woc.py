@@ -65,10 +65,15 @@ class Woc:
                     self.A[m][n][job_task]+=1/self.P
 
     def create_solution(self) -> np.ndarray:
-        solution = np.zeros((self.M, self.N))
+        solution = np.full((self.M, self.N), -1)
         for m in range(self.M):
+            
             for n in range(self.N):
-                solution[m][n] = int(np.argmax(self.A[m][n]))
+                indices = np.argsort(self.A[m][n])
+                for i in indices:
+                    if not i in solution[m]:
+                        solution[m][n] = i
+                        break
         return solution
 
     def solution(self):
