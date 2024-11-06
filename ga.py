@@ -3,7 +3,6 @@ import numpy as np
 from solution import Solution 
 
 def mutate(sol: Solution) -> Solution:
-   
     if random.random() < Solution.mutate_rate:
         machine = random.randint(0, sol.schedule.shape[0] - 1)
         job1, job2 = random.sample(range(sol.schedule.shape[1]), 2)
@@ -11,26 +10,40 @@ def mutate(sol: Solution) -> Solution:
         sol.starts = make_starts(sol.schedule)
     return sol
 
-
 def crossover(s1: Solution, s2: Solution) -> tuple[Solution, Solution]:
-   #Create list of random solutions 
-   #initial chromasomeons solutions in range of 100 [Solution() for_in range(whatever number)]
+    
     if random.random() < Solution.cross_rate:
-        crossover_point = random.randint(1, s1.schedule.shape[1] - 1)
-        new_schedule1 = np.copy(s1.schedule)
-        new_schedule2 = np.copy(s2.schedule)
-        for machine in range(s1.schedule.shape[0]):
-            new_schedule1[machine, crossover_point:], new_schedule2[machine, crossover_point:] = (
-                s2.schedule[machine, crossover_point:],
-                s1.schedule[machine, crossover_point:]
-            )
+        num_machines, num_jobs = s1.schedule.shape
+        new_schedule1 = np.empty_like(s1.schedule)
+        new_schedule2 = np.empty_like(s2.schedule)
+        
+        for machine in range(num_machines):
+            start, end = sorted(random.sample(range(num_jobs), 2))
+            
+            # Copy the selected slice from each parent to the corresponding child
+            new_schedule1[machine, start:end] = s1.schedule[machine, start:end]
+            new_schedule2[machine, start:end] = s2.schedule[machine, start:end]
+            
+            # Fill remaining positions from the other parent, avoiding duplicates
+            fill_from_parent(new_schedule1[machine], s2.schedule[machine], start, end)
+            fill_from_parent(new_schedule2[machine], s1.schedule[machine], start, end)
+        
         return Solution(new_schedule1), Solution(new_schedule2)
+    
     return s1, s2
 
+def fill_from_parent(child_row, parent_row, start, end):
+   
+    pos = end  # Start filling after the crossover slice
+    for job in parent_row:
+        if job not in child_row[start:end]:
+            if pos >= len(child_row):
+                pos = 0  # Wrap around if we reach the end of the row
+            child_row[pos] = job
+            pos += 1
 
 def genetic_algorithm(population_size: int, generations: int) -> Solution:
-   
-   
+    
     population = [Solution() for _ in range(population_size)]
     
     for gen in range(generations):
