@@ -3,6 +3,7 @@ import os
 from solution import Solution
 from solution import plot_solution
 from woc import Woc
+import ga
 '''
 Main python file. 
 Script flow:
@@ -31,7 +32,6 @@ def load_data(name):
         for i in range(n):
             data.append(file.readline().strip().split(' '))
         data = np.array(data, dtype=np.uint8)
-        
         # the way the data is formatted is goofy, this "corrects" it
         # didn't correctly sort the data... I changed it to sort times by corresponding job.... 
         # but I don't think this addresses the problem at hand. 
@@ -51,13 +51,15 @@ def load_data(name):
 def main():
     file = "tai44_0.txt"
     Solution.data = load_data(file)
-    sol = Solution()
-    print(sol.data)
-    print(sol.schedule)
-    print(sol.starts)
-    print()
-    print(sol.calc_makespan())
-    plot_solution(sol)
+    print(ga.genetic_algorithm(1000, 100).makespan)
+
+    # sol = Solution()
+    # print(sol.data)
+    # print(sol.schedule)
+    # print(sol.starts)
+    # print()
+    # print(sol.calc_makespan())
+    # plot_solution(sol)
     # woc_solver = Woc(solution_array)
     # solution = woc_solver.solution() #aggregate schedule
     

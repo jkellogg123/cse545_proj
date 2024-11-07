@@ -66,9 +66,6 @@ class Solution:
             ms = np.max(jt)
             self.makespan = ms
             return ms
-            ms = np.max(jt)
-            self.makespan = ms
-            return ms
 
 
 def random_schedule(shape: tuple[int, int]) -> np.ndarray:
