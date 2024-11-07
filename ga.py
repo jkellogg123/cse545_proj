@@ -1,16 +1,26 @@
 import random
 import numpy as np
-from solution import Solution 
+from solution import Solution, make_starts
 
 def mutate(sol: Solution) -> Solution:
+    """
+    Returns mutated version of *sol*.
+    """
     if random.random() < Solution.mutate_rate:
         machine = random.randint(0, sol.schedule.shape[0] - 1)
         job1, job2 = random.sample(range(sol.schedule.shape[1]), 2)
-        sol.schedule[machine, job1], sol.schedule[machine, job2] = sol.schedule[machine, job2], sol.schedule[machine, job1]
-        sol.starts = make_starts(sol.schedule)
-    return sol
+        new_schedule = np.copy(sol.schedule)
+        new_schedule[machine, job1], new_schedule[machine, job2] = sol.schedule[machine, job2], sol.schedule[machine, job1]
+        res = Solution(new_schedule)
+    else:
+        res = sol
+
+    return res
 
 def crossover(s1: Solution, s2: Solution) -> tuple[Solution, Solution]:
+    """
+    Returns offspring pair of *s1* and *s2*.
+    """
     
     if random.random() < Solution.cross_rate:
         num_machines, num_jobs = s1.schedule.shape
@@ -28,7 +38,9 @@ def crossover(s1: Solution, s2: Solution) -> tuple[Solution, Solution]:
             fill_from_parent(new_schedule1[machine], s2.schedule[machine], start, end)
             fill_from_parent(new_schedule2[machine], s1.schedule[machine], start, end)
         
-        return Solution(new_schedule1), Solution(new_schedule2)
+        # Chooses best two from children and parent solutions
+        c1, c2 = Solution(new_schedule1), Solution(new_schedule2)
+        return sorted([c1, c2, s1, s2], key=lambda x: x.calc_makespan())[:2]
     
     return s1, s2
 
