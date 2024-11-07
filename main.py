@@ -29,13 +29,13 @@ def load_data(name):
         file.readline()
         for i in range(n):
             data.append(file.readline().strip().split(' '))
-        data = np.array(data, dtype=np.uint8)
+        data = np.array(data, dtype=np.int16)
         
         # the way the data is formatted is goofy, this "corrects" it
         file.readline()
         sort = []
         for i in range(n):
-            sort = np.array(file.readline().strip().split(' '), dtype=np.uint8) - 1
+            sort = np.array(file.readline().strip().split(' '), dtype=np.int8) - 1
             data[i][sort] = np.copy(data[i])    # copy is needed because it overwrites element by element, unlike tuple assignment for example
         
     return data.T
