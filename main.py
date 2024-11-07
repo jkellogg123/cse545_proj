@@ -33,12 +33,6 @@ def load_data(name):
         data = np.array(data, dtype=np.uint8)
         
         # the way the data is formatted is goofy, this "corrects" it
-        # didn't correctly sort the data... I changed it to sort times by corresponding job.... 
-        # but I don't think this addresses the problem at hand. 
-        # I propose we use a list of hash maps/ dictionaries or c like struct.
-        # Example data:
-        # data[0] = {start_time: 0, runtime: 64, job_id: 5}
-        # It's a bit of memory/compute overhead but this seems easier to digest and come up with solutions...
         file.readline()
         sort = []
         for i in range(n):
