@@ -25,9 +25,9 @@ class Solution:
 
     def __init__(self, schedule: np.ndarray=None):
         """
-        If *schedule* is given, associates a valid solution with start times
+        If *schedule* is given, associates a valid solution with start times.
 
-        Otherwise, creates a random solution
+        Otherwise, creates a random solution.
         """
         assert self.data is not None, "Initialize Solution.data before instantiating Solution objects"
 
@@ -69,6 +69,9 @@ class Solution:
 
 
 def random_schedule(shape: tuple[int, int]) -> np.ndarray:
+    """
+    Returns a random schedule given *shape* = (num_machines, num_jobs).
+    """
     num_machines, num_jobs = shape
     return np.array([np.random.permutation(num_jobs) for _ in range(num_machines)])
 
@@ -104,9 +107,9 @@ def make_starts(schedule: np.ndarray) -> np.ndarray:
 
 def insert_job(after: float, job_starts: list, length: float) -> float:
     """
-    Returns the best starting time for a job that takes *length* time, inserted after *after*, with the given list *job_starts* of busyness for the job
+    Returns the best starting time for a job that takes *length* time, inserted after *after*, with the given list *job_starts* of busyness for the job.
 
-    Used in *make_starts*
+    Used in *make_starts*.
     """
     if not job_starts:
         return after
@@ -134,7 +137,7 @@ def insert_job(after: float, job_starts: list, length: float) -> float:
     return max(after, job_starts[-1][1])
 
 def plot_solution(solution: Solution):
-    """ Takes a solution and plots it
+    """ Takes a solution and plots it.
     """
     sched = solution.schedule
     starts = solution.starts

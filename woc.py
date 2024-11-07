@@ -1,4 +1,6 @@
 import numpy as np
+from collections.abc import Iterable
+from solution import Solution
 
 # a set of orders in which machines execute tasks. 
 # each numerical value is the job a task corresponds to. 
@@ -80,3 +82,12 @@ class Woc:
         self.find_agreement()
         return self.create_solution()
         
+
+def aggregate(sols: Iterable[Solution]) -> Solution:
+    """
+    Takes a collection of *Solution* objects and aggregates them into one (hopefully better) solution.
+    """
+    scheds = [sol.schedule for sol in sols]
+    woc = Woc(scheds)
+    woc.find_agreement()
+    return Solution(woc.create_solution())

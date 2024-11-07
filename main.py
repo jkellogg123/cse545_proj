@@ -1,8 +1,7 @@
 import numpy as np
 import os
-from solution import Solution
-from solution import plot_solution
-from woc import Woc
+from solution import Solution, plot_solution
+from woc import aggregate
 '''
 Main python file. 
 Script flow:
@@ -14,7 +13,7 @@ Script flow:
     to provide a WOC aggregate solution.
     -log WOC aggregation data
 4) Ensure WOC solution satisfies OSSP constraints 
-5) Compare WOC solution with best GA solutiong
+5) Compare WOC solution with best GA solution
     - if so, replace best solution
 6) Repeat steps 1-6 for all data files.
 '''
@@ -45,24 +44,22 @@ def load_data(name):
 def main():
     file = "tai44_0.txt"
     Solution.data = load_data(file)
-    sol = Solution()
+    # sol = Solution()
+    
+    sols = [Solution() for _ in range(50)]
+    sol = aggregate(sols)
+
     print(sol.data)
     print(sol.schedule)
     print(sol.starts)
     print()
     print(sol.calc_makespan())
     plot_solution(sol)
-    # woc_solver = Woc(solution_array)
-    # solution = woc_solver.solution() #aggregate schedule
-    
 
+    # Iterate through each data file
     # for file in os.listdir("data"):
     #     print(file)
     #     Solution.data = load_data(file)
-        
-    #     ga_solver = Solution()
-    #     for d in ga_solver.data:
-    #         print(d)
     #     print(Solution.data)
 
 if __name__ == "__main__":
