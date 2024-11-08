@@ -11,6 +11,7 @@ test_set = [[[2,3,1],[1,3,2],[3,2,1]],
             [[2,3,1],[1,3,2],[3,2,1]],
             [[1,3,2],[2,3,1],[3,2,1]]]
 class Woc:
+    weights = None
     def __init__(self, experts: np.ndarray | list) -> None:
         '''
         Summary:
@@ -64,7 +65,7 @@ class Woc:
             for m in range(self.M):
                 for n in range(self.N):
                     job_task = self.experts[p][m][n]
-                    self.A[m][n][job_task]+=1/self.P
+                    self.A[m][n][job_task]+=self.weights[p]
 
     def create_solution(self) -> np.ndarray:
         solution = np.full((self.M, self.N), -1)
@@ -89,5 +90,6 @@ def aggregate(sols: Iterable[Solution]) -> Solution:
     """
     scheds = [sol.schedule for sol in sols]
     woc = Woc(scheds)
+    woc.weights = [sol.makespan for sol in sols]
     woc.find_agreement()
     return Solution(woc.create_solution())
