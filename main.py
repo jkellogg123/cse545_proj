@@ -2,6 +2,7 @@ import numpy as np
 import os
 from solution import Solution, plot_solution
 from woc import aggregate
+from ga import genetic_algorithm
 '''
 Main python file. 
 Script flow:
@@ -18,7 +19,10 @@ Script flow:
 6) Repeat steps 1-6 for all data files.
 '''
 
-def load_data(name):
+def load_data(name: str) -> np.ndarray:
+    """
+    Loads data structure from given file name under "./data" directory.
+    """
     path = "./data/" + name
     with open(path, 'r') as file:
         file.readline()
@@ -40,11 +44,18 @@ def load_data(name):
         
     return data.T
 
+def create_data(n: int, max_time=100) -> np.ndarray:
+    """
+    Creates a random dataset with *n* machines and *n* jobs, where each activity takes no more than *max_time* time units exclusive.
+    """
+    return np.random.randint(1, max_time, size=(n, n))
+
 
 def main():
     file = "tai44_0.txt"
     Solution.data = load_data(file)
-    # sol = Solution()
+    # Solution.data = create_data(5)
+    sol = Solution()
     
     sols = [Solution() for _ in range(50)]
     sol = aggregate(sols)
