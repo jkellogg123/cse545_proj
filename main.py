@@ -44,10 +44,13 @@ def load_data(name: str) -> np.ndarray:
         
     return data.T
 
-def create_data(n: int, max_time=100) -> np.ndarray:
+def create_data(n: int, max_time=100, seed: int = None) -> np.ndarray:
     """
     Creates a random dataset with *n* machines and *n* jobs, where each activity takes no more than *max_time* time units exclusive.
     """
+    print(seed)
+    if seed:
+        np.random.seed(seed)
     return np.random.randint(1, max_time, size=(n, n))
 
 
