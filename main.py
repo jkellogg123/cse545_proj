@@ -53,26 +53,26 @@ def create_data(n: int, max_time=100, seed: int = None) -> np.ndarray:
 
 
 def main():
-    file = "tai44_0.txt"
+    file = "tai1515_0.txt"
     Solution.data = load_data(file)
-    # Solution.data = create_data(5)
-    sol = Solution()
+    best_ms = float('inf')
+    ga_solutions = []
+    for _ in range(20):
+        ga_solution = genetic_algorithm(100, 100)
+        ga_solutions.append(ga_solution)
+        ms = ga_solution.calc_makespan()
+        if  ms < best_ms:
+            best_ms = ms
+
+    woc_solution = aggregate(ga_solutions)
     
-    sols = [Solution() for _ in range(50)]
-    sol = aggregate(sols)
-
-    print(sol.data)
-    print(sol.schedule)
-    print(sol.starts)
-    print()
-    print(sol.calc_makespan())
-    plot_solution(sol)
-
-    # Iterate through each data file
-    # for file in os.listdir("data"):
-    #     print(file)
-    #     Solution.data = load_data(file)
-    #     print(Solution.data)
+    woc_ms = woc_solution.calc_makespan()
+    print("Results:")
+    print("Aggregate solution:\n",woc_solution.schedule)
+    print("Aggregate makespan",woc_ms)
+    print("Best makespan for single GA",best_ms)
+    print("Mean makespan from GA",np.mean([x.makespan for x in ga_solutions]))
+    plot_solution(woc_solution)
 
 if __name__ == "__main__":
     main()
