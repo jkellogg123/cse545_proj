@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import os
 from solution import Solution, plot_solution
@@ -42,6 +43,8 @@ def load_data(name):
 
 
 def main():
+    start_time = time.time()
+
     file = "tai44_0.txt"
     Solution.data = load_data(file)
     # sol = Solution()
@@ -49,18 +52,30 @@ def main():
     sols = [Solution() for _ in range(50)]
     sol = aggregate(sols)
 
+
     print(sol.data)
     print(sol.schedule)
     print(sol.starts)
     print()
     print(sol.calc_makespan())
-    plot_solution(sol)
+    
+    end_time = time.time()
+    total_time = end_time - start_time
+    hours = int(total_time // 3600)
+    mins = int ((total_time % 3600) // 60)
+    seconds = int(total_time % 60)
+    milliseconds = int((total_time % 1) * 1000)
+
+    print(f"Total Run Time: {hours} hours, {mins} minutes, {seconds} seconds, {milliseconds} milliseconds.")
+    plot_solution(sol) 
 
     # Iterate through each data file
     # for file in os.listdir("data"):
     #     print(file)
     #     Solution.data = load_data(file)
     #     print(Solution.data)
+
+    
 
 if __name__ == "__main__":
     main()
