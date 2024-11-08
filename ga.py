@@ -23,6 +23,9 @@ def crossover(s1: Solution, s2: Solution) -> tuple[Solution, Solution]:
     """
     
     if random.random() < Solution.cross_rate:
+        # Want unique objects
+        if id(s1) == id(s2):
+            s2 = Solution(s2.schedule)
         num_machines, num_jobs = s1.schedule.shape
         new_schedule1 = np.empty_like(s1.schedule)
         new_schedule2 = np.empty_like(s2.schedule)
