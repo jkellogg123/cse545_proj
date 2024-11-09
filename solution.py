@@ -175,7 +175,6 @@ def plot_solution(solution: Solution, xlim : int = None, title : str = "", save_
     if save_path:
         path = f"./output/solution_plots/{save_path}.png"
         plt.savefig(path, bbox_inches="tight")
-        print("Saving Plot")
         plt.close()
     else:
         plt.show()
