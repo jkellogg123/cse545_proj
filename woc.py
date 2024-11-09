@@ -11,6 +11,7 @@ test_set = [[[2,3,1],[1,3,2],[3,2,1]],
             [[2,3,1],[1,3,2],[3,2,1]],
             [[1,3,2],[2,3,1],[3,2,1]]]
 class Woc:
+    weights = None
     def __init__(self, experts: np.ndarray | list) -> None:
         '''
         Summary:
@@ -64,7 +65,7 @@ class Woc:
             for m in range(self.M):
                 for n in range(self.N):
                     job_task = self.experts[p][m][n]
-                    self.A[m][n][job_task]+=1/self.P
+                    self.A[m][n][job_task]+=self.weights[p]
 
     def create_solution(self) -> np.ndarray:
         solution = np.full((self.M, self.N), -1)
@@ -89,5 +90,46 @@ def aggregate(sols: Iterable[Solution]) -> Solution:
     """
     scheds = [sol.schedule for sol in sols]
     woc = Woc(scheds)
+    woc.weights = [sol.makespan for sol in sols]
     woc.find_agreement()
     return Solution(woc.create_solution())
+
+def aggregate_sequence (solutions: list[Solution]) -> Solution:
+    '''
+    aggregate solution based on sequence of tasks for each machine
+
+    Parameters - solutions: list of experts to be aggregated.
+
+    Returns - new solution object that represents aggregated schedule of tasks
+    '''
+
+    num_machines, num_jobs = solutions[0].schedule.shape
+    agreement_matrice = np.zeros((num_machines, num_jobs, num_jobs), dtype = int)
+
+    for sol in solutions: #populate agreement , should loop through experts and count job->job transitions
+        for machine in range(num_machines):
+            for j in range(num_jobs - 1):
+                current_job = sol.schedule[machine, j]
+                next_job = sol.schedule[machine, j + 1] 
+                agreement_matrice[machine, current_job, next_job] += 1 
+
+    consensus_schedule = np.zeros((num_machines, num_jobs) ,dtype = int) # get the consensus sequence which is based off of max agreement
+
+    for machine in range(num_machines):  # loop to determine most agreed-upon sequnce of jobs for each machine
+        current_job = np.argmax(agreement_matrice[machine].sum (axis = 1))
+        visited = {current_job}
+        consensus_schedule[machine, 0] = current_job
+
+        '''
+        Determining next job based off max agreement
+        '''
+        for j in range(1, num_jobs):
+            next_job = np.argmax(agreement_matrice[machine, current_job])
+            while next_job in visited:
+                agreement_matrice[machine, current_job, next_job] = -1 # this marks task used
+                next_job = np.argmax(agreement_matrice[machine, current_job])
+            consensus_schedule[machine, j] = next_job
+            visited.add(next_job)
+            current_job = next_job
+    
+    return Solution(schedule = consensus_schedule)

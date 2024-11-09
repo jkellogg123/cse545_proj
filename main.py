@@ -1,8 +1,11 @@
+import os
+import shutil
 import time
 import numpy as np
-import os
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from solution import Solution, plot_solution
-from woc import aggregate
+from woc import aggregate, aggregate_sequence
+from ga import genetic_algorithm, plot_gens
 '''
 Main python file. 
 Script flow:
@@ -19,7 +22,10 @@ Script flow:
 6) Repeat steps 1-6 for all data files.
 '''
 
-def load_data(name):
+def load_data(name: str) -> np.ndarray:
+    """
+    Loads data structure from given file name under "./data" directory.
+    """
     path = "./data/" + name
     with open(path, 'r') as file:
         file.readline()
@@ -41,41 +47,125 @@ def load_data(name):
         
     return data.T
 
+def create_data(n: int, max_time=100, seed: int = None) -> np.ndarray:
+    """
+    Creates a random dataset with *n* machines and *n* jobs, where each activity takes no more than *max_time* time units exclusive.
+    """
+    np.random.seed(seed)
+    return np.random.randint(1, max_time, size=(n, n))
+
+# Need this wrapper because processes have unique address spaces, so Solution.data doesn't hold.
+def ga_process(ga_params: tuple, data: np.ndarray) -> dict:
+    """
+    Process function that runs ga with given *ga_params*.
+
+    *data* is needed to reset address space.
+    """
+    Solution.data = data
+    return genetic_algorithm(*ga_params)
+
+
+def run_ga(n: int, ga_params: tuple, data: np.ndarray) -> dict:
+    """
+    Runs the genetic algorithm *n* times and returns a dict of (mostly statistic) results.
+    """
+    cores = max(1, (2 * os.cpu_count()) // 3)       # Dedicate 2/3 of logical processors to producing genetic results
+    with ProcessPoolExecutor(max_workers=cores) as executor:
+        futures = [executor.submit(ga_process, ga_params, data) for _ in range(n)]
+        ga_results = []
+        ga_solutions = []
+        best_ms = float('inf')
+
+        for num_completed, future in enumerate(as_completed(futures), 1):
+            print(f"{num_completed} GAs completed")
+
+            ga_result = future.result()
+            ga_results.append(ga_result)
+            sol = ga_result["best_solution"]
+            ga_solutions.append(sol)
+
+            ms = sol.calc_makespan()
+            if  ms < best_ms:
+                best_ms = ms
+                best_sol = sol
+
+    results = {"ga_solutions" : ga_solutions,
+               "best_sol" : best_sol,
+               "best_ms" : best_ms,
+               "avg_ms" : np.mean([sol.makespan for sol in ga_solutions]),
+               "avg_evolution" : np.mean([result["evolution"] for result in ga_results], axis=0),
+               "avg_time" : np.mean([result["time"] for result in ga_results])}
+    return results
 
 def main():
-    start_time = time.time()
+    start = time.time()
 
-    file = "tai44_0.txt"
-    Solution.data = load_data(file)
-    # sol = Solution()
-    
-    sols = [Solution() for _ in range(50)]
-    sol = aggregate(sols)
+    with open("./output/results.txt", 'w') as output_file:
+        def printf(*args, **kwargs):
+            kwargs["file"] = output_file
+            print(*args, **kwargs)
+        
+        printf("----------------------------------------\n")
+
+        data_files = os.listdir("./data")
+        do_files = 2
+
+        for data_file in data_files[:do_files]:
+            print(f"Processing {data_file}")
+            data_file_id = data_file[3:-4]
+            Solution.data = load_data(data_file)
+
+            pop_size = 100
+            num_gens = 100
+            ga_params = (pop_size, num_gens)
+            num_ga = 8
+
+            results = run_ga(num_ga, ga_params, Solution.data)
 
 
-    print(sol.data)
-    print(sol.schedule)
-    print(sol.starts)
-    print()
-    print(sol.calc_makespan())
-    
-    end_time = time.time()
-    total_time = end_time - start_time
-    hours = int(total_time // 3600)
-    mins = int ((total_time % 3600) // 60)
-    seconds = int(total_time % 60)
-    milliseconds = int((total_time % 1) * 1000)
+            woc_solution = aggregate(results["ga_solutions"])
+            woc_ms = woc_solution.calc_makespan()
 
-    print(f"Total Run Time: {hours} hours, {mins} minutes, {seconds} seconds, {milliseconds} milliseconds.")
-    plot_solution(sol) 
+            woc_sequence_solution = aggregate_sequence(results["ga_solutions"])
+            woc_ms_sequence = woc_sequence_solution.calc_makespan()
 
-    # Iterate through each data file
-    # for file in os.listdir("data"):
-    #     print(file)
-    #     Solution.data = load_data(file)
-    #     print(Solution.data)
+            printf(f"Results from \"{data_file}\"\n")
+            printf(f"Average GA makespan:\t\t {results["avg_ms"]:.2f}")
+            printf(f"Best GA makespan:\t\t\t {results["best_ms"]:.2f}")
+            printf(f"Aggregate makespan:\t\t\t {woc_ms:.2f}")
+            printf(f"Average time per GA:\t\t {results["avg_time"]:.3f}s")
+            printf("\n----------------------------------------\n")
+
+            xlim = max(results["best_ms"], woc_ms)
+            plot_solution(woc_solution, xlim, "Aggregated", save_path=f"aggregate/{data_file_id}")
+            plot_solution(woc_sequence_solution, xlim, "Agreegated (Sequence)", save_path = f"aggregate_sequence/{data_file_id}")
+            plot_solution(results["best_sol"], xlim, "Best genetic", save_path=f"ga/{data_file_id}")
+            plot_gens(results["avg_evolution"], f"n={len(Solution.data)}", save_path=data_file_id)
+
+            print()
+        
+
+        end = time.time()
+        lol = f"\nWhole thing took:\t{end - start:.3f}s"
+        print(lol)
+        printf(lol)
+
+
+def reset_output() -> None:
+    """
+    Clears "./output" directory. Currently does this by deleting it and readding it.
+    """
+    remove = "./output"
+    if os.path.exists(remove):
+        shutil.rmtree(remove)
+
+    # If I really cared I would make these global variables
+    dirs = ("./output/solution_plots/aggregate", "./output/solution_plots/aggregate_sequence","./output/solution_plots/ga", "./output/ga_evolution")
+    for dir in dirs:
+        os.makedirs(dir)
 
     
 
 if __name__ == "__main__":
+    reset_output()
     main()
