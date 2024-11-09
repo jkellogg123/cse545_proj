@@ -133,8 +133,12 @@ def insert_job(after: float, job_starts: list, length: float) -> float:
     # Doesn't fit in gaps
     return max(after, job_starts[-1][1])
 
-def plot_solution(solution: Solution):
-    """ Takes a solution and plots it.
+def plot_solution(solution: Solution, xlim : int = None, title : str = "", save_path : str = None):
+    """
+    Takes a solution and plots it.
+
+    If *save_path* is given as a nonempty string, will save plot in "./output/solution_plots/" under *save_path*.png.
+
     """
     sched = solution.schedule
     starts = solution.starts
@@ -160,10 +164,17 @@ def plot_solution(solution: Solution):
     ax.set_ylabel("Machines")
     ax.set_yticks(range(num_machines))
     ax.set_yticklabels([f"M{i+1}" for i in range(num_machines)])
-    plt.title("Open-Shop Schedule")
+    plt.title(f"Open-Shop Schedule" + f" ({title})" if title else "")
+    if xlim:
+        plt.xlim(0, xlim)
     #ax.grid(True, axis='x', linestyle='--', alpha=0.7)
 
     # Display's first machine at the top
     ax.invert_yaxis()
 
-    plt.show()
+    if save_path:
+        path = f"./output/solution_plots/{save_path}.png"
+        plt.savefig(path, bbox_inches="tight")
+        plt.close()
+    else:
+        plt.show()

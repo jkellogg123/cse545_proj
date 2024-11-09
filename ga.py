@@ -1,5 +1,7 @@
 import random
 import numpy as np
+import time
+import matplotlib.pyplot as plt
 from solution import Solution
 
 def mutate(sol: Solution) -> Solution:
@@ -57,15 +59,21 @@ def fill_from_parent(child_row, parent_row, start, end):
             child_row[pos] = job
             pos += 1
 
-def genetic_algorithm(population_size: int, generations: int) -> Solution:
+def genetic_algorithm(population_size: int, generations: int) -> dict:
+    """
+    Runs ga with given parameters and returns dictionary of results.
+    """
+    start = time.process_time()
     
     population = [Solution() for _ in range(population_size)]
+    evolution = []
     
     for gen in range(generations):
         for sol in population:
             sol.calc_makespan()
 
         population.sort(key=lambda x: x.makespan)
+        evolution.append(population[0].makespan)
         
         next_gen = population[:population_size // 2]
 
@@ -79,4 +87,29 @@ def genetic_algorithm(population_size: int, generations: int) -> Solution:
         population = next_gen
 
     best_solution = min(population, key=lambda x: x.makespan)
-    return best_solution
+
+    end = time.process_time()
+    results = {"best_solution" : best_solution,
+               "evolution" : evolution,
+               "time" : end - start,}
+    return results
+
+
+def plot_gens(gens: list[float], title: str = None, save_path : str = None) -> None:
+    """
+    Takes list of makespan per generation and plots its evolution.
+
+    If *save_path* is given as a nonempty string, saves plot at "./output/ga_evolution/" under *save_path*.png
+    """
+
+    plt.plot(range(1, len(gens)+1), gens)
+
+    plt.title("Genetic Algorithm Evolution" + f" ({title})" if title else "")
+    plt.xlabel("Generation #")
+    plt.ylabel("Makespan")
+    if save_path:
+        path = f"./output/ga_evolution/{save_path}.png"
+        plt.savefig(path, bbox_inches="tight")
+        plt.close()
+    else:
+        plt.show()
