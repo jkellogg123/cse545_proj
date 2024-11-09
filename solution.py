@@ -145,7 +145,7 @@ def plot_solution(solution: Solution, xlim : int = None, title : str = "", save_
     data = solution.data
     num_machines, num_jobs = sched.shape
 
-    # Change tab10 to tab20 or rsv if more than 10 jobs
+    # Change tab10 to tab20 or hsv if more than 10 jobs
     colors = plt.cm.get_cmap("tab10", num_jobs)
     
     fig, ax = plt.subplots(figsize=(10,6))
