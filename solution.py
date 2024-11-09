@@ -164,7 +164,7 @@ def plot_solution(solution: Solution, xlim : int = None, title : str = "", save_
     ax.set_ylabel("Machines")
     ax.set_yticks(range(num_machines))
     ax.set_yticklabels([f"M{i+1}" for i in range(num_machines)])
-    plt.title(f"Open-Shop Schedule" + f" ({title})" if title else "")
+    plt.title(f"Open-Shop Schedule: {solution.makespan}" f" ({title})" if title else "")
     if xlim:
         plt.xlim(0, xlim)
     #ax.grid(True, axis='x', linestyle='--', alpha=0.7)
@@ -175,6 +175,7 @@ def plot_solution(solution: Solution, xlim : int = None, title : str = "", save_
     if save_path:
         path = f"./output/solution_plots/{save_path}.png"
         plt.savefig(path, bbox_inches="tight")
+        print("Saving Plot")
         plt.close()
     else:
         plt.show()
