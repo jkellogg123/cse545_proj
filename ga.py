@@ -3,7 +3,7 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 from solution import Solution
-
+from woc import aggregate
 def mutate(sol: Solution) -> Solution:
     """
     Returns mutated version of *sol*.
@@ -24,28 +24,29 @@ def crossover(s1: Solution, s2: Solution) -> tuple[Solution, Solution]:
     Returns offspring pair of *s1* and *s2*.
     """
     
-    if random.random() < Solution.cross_rate:
-        # Want unique objects
-        if id(s1) == id(s2):
-            s2 = Solution(s2.schedule)
-        num_machines, num_jobs = s1.schedule.shape
-        new_schedule1 = np.empty_like(s1.schedule)
-        new_schedule2 = np.empty_like(s2.schedule)
+    # if random.random() < Solution.cross_rate:
+    # Want unique objects
+    if id(s1) == id(s2):
+        s2 = Solution(s2.schedule)
+    num_machines, num_jobs = s1.schedule.shape
+    new_schedule1 = np.empty_like(s1.schedule)
+    new_schedule2 = np.empty_like(s2.schedule)
+    
+    for machine in range(num_machines):
+        start, end = sorted(random.sample(range(num_jobs), 2))
         
-        for machine in range(num_machines):
-            start, end = sorted(random.sample(range(num_jobs), 2))
-            
-            # Copy the selected slice from each parent to the corresponding child
-            new_schedule1[machine, start:end] = s1.schedule[machine, start:end]
-            new_schedule2[machine, start:end] = s2.schedule[machine, start:end]
-            
-            # Fill remaining positions from the other parent, avoiding duplicates
-            fill_from_parent(new_schedule1[machine], s2.schedule[machine], start, end)
-            fill_from_parent(new_schedule2[machine], s1.schedule[machine], start, end)
+        # Copy the selected slice from each parent to the corresponding child
+        new_schedule1[machine, start:end] = s1.schedule[machine, start:end]
+        new_schedule2[machine, start:end] = s2.schedule[machine, start:end]
         
-        # Chooses best two from children and parent solutions
-        c1, c2 = Solution(new_schedule1), Solution(new_schedule2)
-        return sorted([c1, c2, s1, s2], key=lambda x: x.calc_makespan())[:2]
+        # Fill remaining positions from the other parent, avoiding duplicates
+        fill_from_parent(new_schedule1[machine], s2.schedule[machine], start, end)
+        fill_from_parent(new_schedule2[machine], s1.schedule[machine], start, end)
+    
+    # Chooses best two from children and parent solutions
+    c1, c2 = Solution(new_schedule1), Solution(new_schedule2)
+    return c1, c2
+        # return sorted([c1, c2, s1, s2], key=lambda x: x.calc_makespan())[:2]
     
     return s1, s2
 
@@ -75,17 +76,32 @@ def genetic_algorithm(population_size: int, generations: int) -> dict:
         population.sort(key=lambda x: x.makespan)
         evolution.append(population[0].makespan)
         
-        next_gen = population[:population_size // 2]
+        next_gen = population[:population_size // 10]
 
         while len(next_gen) < population_size:
             parent1, parent2 = random.sample(next_gen, 2)
             offspring1, offspring2 = crossover(parent1, parent2)
-            next_gen.append(mutate(offspring1))
+            offspring1 = mutate(offspring1)
+            offspring2 = mutate(offspring2)
+            offspring1.calc_makespan()
+            offspring2.calc_makespan()
+            next_gen.append(offspring1)
             if len(next_gen) < population_size:
-                next_gen.append(mutate(offspring2))
+                next_gen.append(offspring2)
 
         population = next_gen
+    experts = population
+    experts.sort(key=lambda x: x.makespan)
+    woc_solution = aggregate(experts[:int(population_size//10)])
+    print(experts[0].schedule)
+    woc_ms = woc_solution.calc_makespan()
+    print("Results:")
 
+    print("Aggregate solution:\n",woc_solution.starts)
+    print("Aggregate makespan",woc_ms)
+    print("worst makespan: ", np.max([x.makespan for x in experts]))
+    print("best makespan: ", np.min([x.makespan for x in experts]))
+    print("Mean makespan from GA",np.mean([x.makespan for x in experts]))
     best_solution = min(population, key=lambda x: x.makespan)
 
     end = time.process_time()

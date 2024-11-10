@@ -115,10 +115,13 @@ def main():
             data_file_id = data_file[3:-4]
             Solution.data = load_data(data_file)
 
+            # data_file_id = "RANDOM_4X4"
+            # Solution.data = create_data(4)
+
             pop_size = 100
             num_gens = 100
             ga_params = (pop_size, num_gens)
-            num_ga = 8
+            num_ga = 20
 
             results = run_ga(num_ga, ga_params, Solution.data)
 

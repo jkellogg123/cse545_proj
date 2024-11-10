@@ -51,8 +51,7 @@ class Woc:
 
         self.P, self.M, self.N = np.array(experts).shape
 
-        self.A = np.zeros([self.N, self.M, self.M])
-        self.A_shape = np.shape(self.A)
+        self.A = np.zeros([self.M, self.N, self.N])
     
     def print_A(self):
         print(self.A)
@@ -69,19 +68,32 @@ class Woc:
 
     def create_solution(self) -> np.ndarray:
         solution = np.full((self.M, self.N), -1)
-        for m in range(self.M):
-            
-            for n in range(self.N):
-                indices = np.argsort(self.A[m][n])
-                for i in indices:
-                    if not i in solution[m]:
-                        solution[m][n] = i
-                        break
+        flattened_ranks = np.argsort(self.A, axis=None)
+        # print(flattened_ranks)
+        machine, task, job_task = np.unravel_index(np.flip(flattened_ranks), self.A.shape)
+        # print(self.A.shape)
+        # print(self.A)
+        # print(f"{machine} \n{task} \n{job_task}")
+        for x in range(len(machine)):
+            if -1 not in solution:
+                break
+            m = machine[x]
+            n1 = task[x]
+            n2 = job_task[x]
+            # print(solution)
+            # print(f"m: {m} | n1: {n1} | n2: {n2}")
+            # input()
+            if solution[m][n1] == -1:
+                solution[m][n1] = n2
+
+        # for m in range(self.M):
+        #     for n in range(self.N):
+        #         for i in indices:
+        #             if not i in solution[m]:
+        #                 solution[m][n] = i
+        #                 break
         return solution
 
-    def solution(self):
-        self.find_agreement()
-        return self.create_solution()
         
 
 def aggregate(sols: Iterable[Solution]) -> Solution:
@@ -91,5 +103,7 @@ def aggregate(sols: Iterable[Solution]) -> Solution:
     scheds = [sol.schedule for sol in sols]
     woc = Woc(scheds)
     woc.weights = [sol.makespan for sol in sols]
+    total_weight = np.sum(woc.weights)
+    for weight in woc.weights: weight/=total_weight
     woc.find_agreement()
     return Solution(woc.create_solution())
