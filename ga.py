@@ -3,7 +3,7 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 from solution import Solution
-from woc import aggregate
+
 def mutate(sol: Solution) -> Solution:
     """
     Returns mutated version of *sol*.
@@ -24,10 +24,13 @@ def crossover(s1: Solution, s2: Solution) -> tuple[Solution, Solution]:
     Returns offspring pair of *s1* and *s2*.
     """
     
-    # if random.random() < Solution.cross_rate:
     # Want unique objects
     if id(s1) == id(s2):
         s2 = Solution(s2.schedule)
+
+    if random.random() >= Solution.cross_rate:
+        return s1, s2
+    
     num_machines, num_jobs = s1.schedule.shape
     new_schedule1 = np.empty_like(s1.schedule)
     new_schedule2 = np.empty_like(s2.schedule)
@@ -45,11 +48,8 @@ def crossover(s1: Solution, s2: Solution) -> tuple[Solution, Solution]:
     
     # Chooses best two from children and parent solutions
     c1, c2 = Solution(new_schedule1), Solution(new_schedule2)
-    return c1, c2
-        # return sorted([c1, c2, s1, s2], key=lambda x: x.calc_makespan())[:2]
+    return sorted([c1, c2, s1, s2], key=lambda x: x.makespan)[:2]
     
-    return s1, s2
-
 def fill_from_parent(child_row, parent_row, start, end):
    
     pos = end  # Start filling after the crossover slice
@@ -70,9 +70,6 @@ def genetic_algorithm(population_size: int, generations: int) -> dict:
     evolution = []
     
     for gen in range(generations):
-        for sol in population:
-            sol.calc_makespan()
-
         population.sort(key=lambda x: x.makespan)
         evolution.append(population[0].makespan)
         
@@ -83,27 +80,13 @@ def genetic_algorithm(population_size: int, generations: int) -> dict:
             offspring1, offspring2 = crossover(parent1, parent2)
             offspring1 = mutate(offspring1)
             offspring2 = mutate(offspring2)
-            offspring1.calc_makespan()
-            offspring2.calc_makespan()
             next_gen.append(offspring1)
             if len(next_gen) < population_size:
                 next_gen.append(offspring2)
 
         population = next_gen
-    experts = population
-    experts.sort(key=lambda x: x.makespan)
-    woc_solution = aggregate(experts[:int(population_size//10)])
-    print(experts[0].schedule)
-    woc_ms = woc_solution.calc_makespan()
-    print("Results:")
 
-    print("Aggregate solution:\n",woc_solution.starts)
-    print("Aggregate makespan",woc_ms)
-    print("worst makespan: ", np.max([x.makespan for x in experts]))
-    print("best makespan: ", np.min([x.makespan for x in experts]))
-    print("Mean makespan from GA",np.mean([x.makespan for x in experts]))
     best_solution = min(population, key=lambda x: x.makespan)
-
     end = time.process_time()
     results = {"best_solution" : best_solution,
                "evolution" : evolution,

@@ -10,7 +10,7 @@ class Solution:
     Attributes:
         schedule (2D np array):         schedule[i, j] is the jth job of the ith machine
         starts (2D np array):           starts[i, j] is the starting time of the jth job of ith machine
-        makespan (float):               total time of solution. Initially -1 until calculated with calc_makespan()
+        makespan (float):               total time of solution. Needs to be recalculated if the solution object's schedule changes
 
         data (static, 2D np array):     data[i, j] is the time-length of the jth job on the ith machine
         cross_rate (static, float):     0 <= rate <= 1, denotes frequency of crossover operation
@@ -19,7 +19,6 @@ class Solution:
     """
 
     data = None
-    task_jobs = None
     cross_rate = 0.75
     mutate_rate = 0.02
 
@@ -31,7 +30,6 @@ class Solution:
         """
         assert self.data is not None, "Initialize Solution.data before instantiating Solution objects"
 
-        self.makespan = -1
         if schedule is None:
             # Create random solution
             self.schedule = random_schedule(self.data.shape)
@@ -40,6 +38,8 @@ class Solution:
             # Assign starts to given schedule
             self.schedule = schedule
             self.starts = make_starts(schedule)
+
+        self.makespan = self.calc_makespan()
     
     def job_times(self) -> np.ndarray:
         """
@@ -57,14 +57,13 @@ class Solution:
 
     def calc_makespan(self) -> float:
         """
-        Returns and sets the makespan of the solution (total finishing time).
+        Returns the makespan of the solution (total finishing time).
         """
         jt = self.job_times()
         if jt is None:
             return -1
         else:
             ms = np.max(jt)
-            self.makespan = ms
             return ms
 
 
